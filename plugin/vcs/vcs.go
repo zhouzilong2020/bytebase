@@ -92,6 +92,14 @@ type RepositoryMember struct {
 	RoleProvider Type               `json:"roleProvider"`
 }
 
+// Repository is the API message for  repository info.
+type Repository struct {
+	ID       int64  `jsonapi:"primary,id"`
+	Name     string `jsonapi:"attr,name"`
+	FullPath string `jsonapi:"attr,fullPath"`
+	WebURL   string `jsonapi:"attr,webUrl"`
+}
+
 // Provider is the interface for VCS provider.
 type Provider interface {
 	// Returns the API URL for a given VCS instance URL
@@ -103,7 +111,7 @@ type Provider interface {
 	// instanceURL: VCS instance URL
 	// code: authentication code of a given user
 	// redirectURL: redirect url configured at the VCS application
-	ExchangeOauthContent(ctx context.Context, instanceURL string, oauthCtx common.OauthContext, code string, redirectURL string) (*common.OAuthToken, error)
+	ExchangeOAuthToken(ctx context.Context, instanceURL string, oauthExchange common.OAuthExchange, code string, redirectURL string) (*common.OAuthToken, error)
 
 	// Try to use this provider as an auth provider and fetch the user info from the OAuth context
 	//
@@ -125,11 +133,11 @@ type Provider interface {
 	// repositoryID: the repository ID from the external VCS system (note this is NOT the ID of Bytebase's own repository resource)
 	FetchRepositoryActiveMemberList(ctx context.Context, oauthCtx common.OauthContext, instanceURL string, repositoryID string) ([]*RepositoryMember, error)
 
-	// Fetch all repository list within the scope of the given user
+	// Fetch all repository in which the authenticated user has a maintainer role
 	//
 	// oauthCtx: OAuth context to write the file content
 	// instanceURL: VCS instance URL
-	FetchRepositoryList(ctx context.Context, oauthCtx common.OauthContext, instanceURL string) ([]byte, error)
+	FetchRepositoryList(ctx context.Context, oauthCtx common.OauthContext, instanceURL string) ([]*Repository, error)
 
 	// Commits a new file
 	//
