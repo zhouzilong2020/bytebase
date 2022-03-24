@@ -191,7 +191,7 @@ func (provider *Provider) APIURL(instanceURL string) string {
 }
 
 // ExchangeOAuthToken exchange oauth content with the provdied authentication code
-func (provider *Provider) ExchangeOAuthToken(ctx context.Context, instanceURL string, oauthExchange common.OAuthExchange, code string, redirectURL string) (*common.OAuthToken, error) {
+func (provider *Provider) ExchangeOAuthToken(ctx context.Context, instanceURL string, oauthExchange common.OAuthExchange, code string, redirectURL string) (*vcs.OAuthToken, error) {
 	urlParams := &url.Values{}
 	urlParams.Set("client_id", oauthExchange.ClientID)
 	urlParams.Set("client_secret", oauthExchange.ClientSecret)
@@ -222,7 +222,7 @@ func (provider *Provider) ExchangeOAuthToken(ctx context.Context, instanceURL st
 		return nil, fmt.Errorf("failed to read oauth response body, code %v, error: %v", resp.StatusCode, err)
 	}
 
-	oauthToken := &common.OAuthToken{}
+	oauthToken := &vcs.OAuthToken{}
 	if err := json.Unmarshal(body, oauthToken); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal oauth response body, code %v, error: %v", resp.StatusCode, err)
 	}

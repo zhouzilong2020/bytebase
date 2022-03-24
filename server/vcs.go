@@ -195,7 +195,7 @@ func (s *Server) registerVCSRoutes(g *echo.Group) {
 			return echo.NewHTTPError(http.StatusNotFound, fmt.Sprintf("Failed to find VCS, ID: %v", id))
 		}
 
-		externalRepoList, err := vcsPlugin.Get(vcsFound.Type, vcsPlugin.ProviderConfig{Logger: s.l}).FetchRepositoryList(
+		externalRepoListRaw, err := vcsPlugin.Get(vcsFound.Type, vcsPlugin.ProviderConfig{Logger: s.l}).FetchRepositoryList(
 			ctx,
 			common.OauthContext{
 				ClientID:     vcsFound.ApplicationID,
@@ -208,6 +208,16 @@ func (s *Server) registerVCSRoutes(g *echo.Group) {
 		)
 		if err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Failed to find external repository, instance URL: %s", vcsFound.InstanceURL)).SetInternal(err)
+		}
+
+		var externalRepoList []*api.ExternalRepository
+		for _, repo := range externalRepoListRaw {
+			externalRepoList = append(externalRepoList, &api.ExternalRepository{
+				ID:       repo.ID,
+				FullPath: repo.FullPath,
+				Name:     repo.Name,
+				WebURL:   repo.WebURL,
+			})
 		}
 
 		c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSONCharsetUTF8)
