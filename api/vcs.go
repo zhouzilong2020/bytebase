@@ -121,6 +121,14 @@ type VCSDelete struct {
 	DeleterID int
 }
 
+// ExternalRepository is the API message for external repository
+type ExternalRepository struct {
+	ID       int64  `jsonapi:"primary,id"`
+	Name     string `jsonapi:"attr,name"`
+	FullPath string `jsonapi:"attr,fullPath"`
+	WebURL   string `jsonapi:"attr,webUrl"`
+}
+
 // VCSService is the service for VCSs.
 type VCSService interface {
 	CreateVCS(ctx context.Context, create *VCSCreate) (*VCSRaw, error)
